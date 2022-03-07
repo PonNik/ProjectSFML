@@ -15,7 +15,7 @@ ProjectSFML
 07.03.22
 Созданн класс GameEngine туда перенесен соновной код который находился в main
 Упрощение main.cpp путем работы с классом
-'''
+'''gsx
 #include <SFML/Graphics.hpp>
 #include "GameEngine.h"
 
