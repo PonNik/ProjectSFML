@@ -34,5 +34,17 @@ int main()
 // это весь код main.cpp
 
 // провел работу с таймером который уменьшает количество операций в программе
-
+```
+sf::Clock loop_timer;
+while (window.isOpen()){
+	input();
+	update();
+	draw();
+	sf::Int32 frame_duration = loop_timer.getElapsedTime().asMilliseconds(); 
+	sf::Int32 time_to_sleep = int(1000.f / want_fps) - frame_duration;
+	if(time_to_sleep > 0) {
+		sf::sleep(sf::milliseconds(time_to_sleep));
+	}
+}
+```
 // это защищает нас от траты всех ресурсов ПК на ненужные иттерации
