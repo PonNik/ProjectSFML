@@ -1,0 +1,116 @@
+#include "GameEngine.h"
+
+void GameEngine::start() {
+	// Вектор разрешения экрана
+	sf::Vector2i resolution;
+	// Записываем разрешение экрана в вектор
+    resolution.x = sf::VideoMode::getDesktopMode().width;
+    resolution.y = sf::VideoMode::getDesktopMode().height;
+
+	// Объект, который, собственно, является главным окном приложения
+    window.create(sf::VideoMode(resolution.x, resolution.y),
+        "SFML Works!",
+        sf::Style::Fullscreen);
+	// Начинаем запись времени
+	sf::Clock loop_timer;
+	while (window.isOpen()){
+		input();
+		update();
+		draw();
+		sf::Int32 frame_duration = loop_timer.getElapsedTime().asMilliseconds(); 
+		sf::Int32 time_to_sleep = int(1000.f / want_fps) - frame_duration;
+		if(time_to_sleep > 0) {
+			sf::sleep(sf::milliseconds(time_to_sleep));
+		}
+	}
+
+}
+void GameEngine::update() {
+	while (window.pollEvent(event))
+	{
+		input();
+		draw();
+	}
+}
+
+void GameEngine::input() {
+	switch (event.type)
+	{
+		// Пользователь нажал на кнопку клавиатуры
+	case sf::Event::KeyPressed:
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Escape)) {
+			// тогда закрываем его 
+			window.close();
+		}
+		break;
+		// Создание кругов с заданными значениями
+	case sf::Event::MouseButtonPressed:
+		if (event.mouseButton.button == sf::Mouse::Left) {
+			// добавляем запись в конец массива 
+			cS.push_back(createShape(r, col, window));
+		}
+		break;
+		// Увеличение и уменьшение радиуса круга 
+	case sf::Event::MouseWheelMoved:
+		// Если колесико вверх добаляем единицу к радиусу
+		if (event.mouseWheel.delta > 0) {
+			r += 1;
+		}
+		// Иначе забираем единицу
+		else
+		{
+			r -= 1;
+		}
+		break;
+	case sf::Event::MouseMoved:
+		for (int i = 0; i < cS.size(); i++) {
+			// Удаление круга из массива
+			if (cS[i].getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y)) {
+				// Если курсор наведен на круг то он становится красным
+				cS[i].setFillColor(sf::Color::Red);
+				if (sf::Event::MouseButtonPressed) {
+					if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+						// удаление элемента массива 
+						std::vector<sf::CircleShape>::iterator it1 = cS.begin() + i;
+						cS.erase(it1);
+					}
+				}
+			}
+			else {
+				// Если курсор не наведен на круг, то он становится зеленым
+				cS[i].setFillColor(sf::Color::Green);
+			}
+		}
+		break;
+	default:
+		break;
+	}
+}
+
+void GameEngine::draw() {
+	// Очистка окна
+	window.clear();
+	// рисование и изменение кругов
+	for (int i = 0; i < cS.size(); i++) {
+		// Отрисовка каждого круга в массиве
+		window.draw(cS[i]);
+	}
+	// Отрисовка окна	
+	window.display();
+
+}
+
+
+////////
+// Создание кругов
+sf::CircleShape GameEngine::createShape(float R, sf::Color color, sf::RenderWindow& window) {
+	// Создание круга с радиусом R
+	sf::CircleShape s(R);
+	// Координаты переносятся в середину круга
+	s.setOrigin(R, R);
+	// Заливка круга зеленым цветом
+	s.setFillColor(sf::Color::Green);
+	// Задается позиция середины круга в координаты мыши
+	s.setPosition(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y);
+	return s;
+}
