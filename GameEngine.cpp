@@ -13,6 +13,11 @@ void GameEngine::start() {
         sf::Style::Fullscreen);
 	// Начинаем запись времени
 	sf::Clock loop_timer;
+	font.loadFromFile("LetoTextSansDefect.otf");
+	text.setFont(font);
+	sf::String str(L" Esc - Выход\n 1 - Выбрать круг\n 2 - Выбрать квадрат\n ЛКМ - создать выбранную фигуру\n ПКМ - удалить выбранную фигуру\n Колесико мыши вниз - Уменьшить фигуру\n Колксико мыши вверх - Увеличить фигуру");
+	text.setString(str);
+	text.setCharacterSize(20);
 	while (window.isOpen()){
 		input();
 		update();
@@ -34,6 +39,14 @@ void GameEngine::update() {
 }
 
 void GameEngine::input() {
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && sellectShape == 1) {
+		//добавляем запись в конец массива 
+		cS.push_back(createCircle(r, col, window));
+	}
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && sellectShape == 2) {
+		// добавляем запись в конец массива 
+		rS.push_back(createRectangle(width, height, col, window));
+	}
 	switch (event.type)
 	{
 		// Пользователь нажал на кнопку клавиатуры
@@ -42,12 +55,17 @@ void GameEngine::input() {
 			// тогда закрываем его 
 			window.close();
 		}
-		break;
-		// Создание кругов с заданными значениями
-	case sf::Event::MouseButtonPressed:
-		if (event.mouseButton.button == sf::Mouse::Left) {
-			// добавляем запись в конец массива 
-			cS.push_back(createShape(r, col, window));
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) {
+			sellectShape = 1;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)) {
+			sellectShape = 2;
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete) && sellectShape == 1) {
+			cS.clear();
+		}
+		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete) && sellectShape == 2) {
+			rS.clear();
 		}
 		break;
 		// Увеличение и уменьшение радиуса круга 
@@ -55,11 +73,15 @@ void GameEngine::input() {
 		// Если колесико вверх добаляем единицу к радиусу
 		if (event.mouseWheel.delta > 0) {
 			r += 1;
+			width += 1;
+			height += 1;
 		}
 		// Иначе забираем единицу
 		else
 		{
 			r -= 1;
+			width -= 1;
+			height -= 1;
 		}
 		break;
 	case sf::Event::MouseMoved:
@@ -76,9 +98,27 @@ void GameEngine::input() {
 					}
 				}
 			}
-			else {
+			else if (cS[i].getFillColor() != sf::Color::Green) {
 				// Если курсор не наведен на круг, то он становится зеленым
 				cS[i].setFillColor(sf::Color::Green);
+			}
+		}
+		for (int i = 0; i < rS.size(); i++) {
+			// Удаление круга из массива
+			if (rS[i].getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y)) {
+				// Если курсор наведен на круг то он становится красным
+				rS[i].setFillColor(sf::Color::Red);
+				if (sf::Event::MouseButtonPressed) {
+					if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+						// удаление элемента массива 
+						std::vector<sf::RectangleShape>::iterator it1 = rS.begin() + i;
+						rS.erase(it1);
+					}
+				}
+			}
+			else if (rS[i].getFillColor() != sf::Color::Green) {
+				// Если курсор не наведен на круг, то он становится зеленым
+				rS[i].setFillColor(sf::Color::Green);
 			}
 		}
 		break;
@@ -95,6 +135,11 @@ void GameEngine::draw() {
 		// Отрисовка каждого круга в массиве
 		window.draw(cS[i]);
 	}
+	for (int i = 0; i < rS.size(); i++) {
+		// Отрисовка каждого круга в массиве
+		window.draw(rS[i]);
+	}
+	window.draw(text);
 	// Отрисовка окна	
 	window.display();
 
@@ -103,11 +148,23 @@ void GameEngine::draw() {
 
 ////////
 // Создание кругов
-sf::CircleShape GameEngine::createShape(float R, sf::Color color, sf::RenderWindow& window) {
+sf::CircleShape GameEngine::createCircle(float R, sf::Color color, sf::RenderWindow& window) {
 	// Создание круга с радиусом R
 	sf::CircleShape s(R);
 	// Координаты переносятся в середину круга
 	s.setOrigin(R, R);
+	// Заливка круга зеленым цветом
+	s.setFillColor(sf::Color::Green);
+	// Задается позиция середины круга в координаты мыши
+	s.setPosition(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y);
+	return s;
+}
+sf::RectangleShape GameEngine::createRectangle(float width, float height, sf::Color color, sf::RenderWindow& window) {
+	sf::Vector2f vecRect(width, height);
+	// Создание круга с радиусом R
+	sf::RectangleShape s(vecRect);
+	// Координаты переносятся в середину круга
+	s.setOrigin(width/2, height/2);
 	// Заливка круга зеленым цветом
 	s.setFillColor(sf::Color::Green);
 	// Задается позиция середины круга в координаты мыши
