@@ -54,6 +54,7 @@ while (window.isOpen()){
 08.03.22
 
  - Добавленны подсказки управления
+
 ![image](https://user-images.githubusercontent.com/93863311/157324077-d7bd5f6a-a5f6-41fe-8929-42a36a4b2948.png)
 ![image](https://user-images.githubusercontent.com/93863311/157324110-8cb1f1fc-1344-40c8-96ea-f15b374e3d99.png)
  - Теперь можно рисовать не только круги, но и квадраты 
