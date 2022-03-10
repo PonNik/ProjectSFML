@@ -7,6 +7,8 @@ void GameEngine::start() {
     resolution.x = sf::VideoMode::getDesktopMode().width;
     resolution.y = sf::VideoMode::getDesktopMode().height;
 
+	srand(time(NULL));
+
 	// Объект, который, собственно, является главным окном приложения
     window.create(sf::VideoMode(resolution.x, resolution.y),
         "SFML Works!",
@@ -22,7 +24,6 @@ void GameEngine::start() {
 	sellShapeText.setFont(font);
 	sellShapeText.setCharacterSize(20);
 	sellShapeText.setPosition(0, resolution.y - 40);
-
 
 	while (window.isOpen()){
 		input();
@@ -47,17 +48,17 @@ void GameEngine::update() {
 void GameEngine::input() {
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && sellectShape == 1) {
 		//добавляем запись в конец массива 
-		cS.push_back(createCircle(r, col, window));
+		objects.createCircle(r, window);
 		sf::sleep(sf::milliseconds(50));
 	}
 	else if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && sellectShape == 2) {
 		// добавляем запись в конец массива 
-		rS.push_back(createRectangle(width, height, col, window));
+		objects.createRectangle(width, height, window);
 		sf::sleep(sf::milliseconds(50));
 	}
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left) && sellectShape == 3) {
 		// добавляем запись в конец массива 
-		tS.push_back(createCircle(r, angle, col, window));
+		objects.createPolygon(r, angle, window);
 		sf::sleep(sf::milliseconds(50));
 	}
 	switch (event.type)
@@ -78,13 +79,13 @@ void GameEngine::input() {
 			sellectShape = 3;
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete) && sellectShape == 1) {
-			cS.clear();
+			objects.deleteCircle();
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete) && sellectShape == 2) {
-			rS.clear();
+			objects.deleteRectangle();
 		}
 		if (sf::Keyboard::isKeyPressed(sf::Keyboard::Delete) && sellectShape == 3) {
-			tS.clear();
+			objects.deletePolygon();
 		}
 		break;
 		// Увеличение и уменьшение радиуса круга 
@@ -104,60 +105,7 @@ void GameEngine::input() {
 		}
 		break;
 	case sf::Event::MouseMoved:
-		for (int i = 0; i < cS.size(); i++) {
-			// Удаление круга из массива
-			if (cS[i].getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y)) {
-				// Если курсор наведен на круг то он становится красным
-				cS[i].setFillColor(sf::Color::Red);
-				if (sf::Event::MouseButtonPressed) {
-					if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
-						// удаление элемента массива 
-						std::vector<sf::CircleShape>::iterator it1 = cS.begin() + i;
-						cS.erase(it1);
-					}
-				}
-			}
-			else if (cS[i].getFillColor() != sf::Color::Green) {
-				// Если курсор не наведен на круг, то он становится зеленым
-				cS[i].setFillColor(sf::Color::Green);
-			}
-		}
-		for (int i = 0; i < rS.size(); i++) {
-			// Удаление круга из массива
-			if (rS[i].getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y)) {
-				// Если курсор наведен на круг то он становится красным
-				rS[i].setFillColor(sf::Color::Red);
-				if (sf::Event::MouseButtonPressed) {
-					if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
-						// удаление элемента массива 
-						std::vector<sf::RectangleShape>::iterator it1 = rS.begin() + i;
-						rS.erase(it1);
-					}
-				}
-			}
-			else if (rS[i].getFillColor() != sf::Color::Green) {
-				// Если курсор не наведен на круг, то он становится зеленым
-				rS[i].setFillColor(sf::Color::Green);
-			}
-		}
-		for (int i = 0; i < tS.size(); i++) {
-			// Удаление круга из массива
-			if (tS[i].getGlobalBounds().contains(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y)) {
-				// Если курсор наведен на круг то он становится красным
-				tS[i].setFillColor(sf::Color::Red);
-				if (sf::Event::MouseButtonPressed) {
-					if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
-						// удаление элемента массива 
-						std::vector<sf::CircleShape>::iterator it1 = tS.begin() + i;
-						tS.erase(it1);
-					}
-				}
-			}
-			else if (tS[i].getFillColor() != sf::Color::Green) {
-				// Если курсор не наведен на круг, то он становится зеленым
-				tS[i].setFillColor(sf::Color::Green);
-			}
-		}
+		objects.sellectedShape(window);
 		break;
 	default:
 		break;
@@ -180,60 +128,11 @@ void GameEngine::draw() {
 		sellShapeText.setString(st + std::to_string(r));
 	}
 	// рисование и изменение кругов
-	for (int i = 0; i < cS.size(); i++) {
-		// Отрисовка каждого круга в массиве
-		window.draw(cS[i]);
-	}
-	for (int i = 0; i < rS.size(); i++) {
-		// Отрисовка каждого круга в массиве
-		window.draw(rS[i]);
-	}
-	for (int i = 0; i < tS.size(); i++) {
-		// Отрисовка каждого круга в массиве
-		window.draw(tS[i]);
-	}
+	objects.draw(window);
 	window.draw(sellShapeText);
 	window.draw(text);
 
 	// Отрисовка окна	
 	window.display();
 	sf::sleep(sf::microseconds(50));
-}
-
-
-////////
-// Создание кругов
-sf::CircleShape GameEngine::createCircle(float R, sf::Color color, sf::RenderWindow& window) {
-	// Создание круга с радиусом R
-	sf::CircleShape s(R);
-	// Координаты переносятся в середину круга
-	s.setOrigin(R, R);
-	// Заливка круга зеленым цветом
-	s.setFillColor(color);
-	// Задается позиция середины круга в координаты мыши
-	s.setPosition(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y);
-	return s;
-}
-sf::CircleShape GameEngine::createCircle(float R,int angle, sf::Color color, sf::RenderWindow& window) {
-	// Создание круга с радиусом R
-	sf::CircleShape s(R, angle);
-	// Координаты переносятся в середину круга
-	s.setOrigin(R, R);
-	// Заливка круга зеленым цветом
-	s.setFillColor(color);
-	// Задается позиция середины круга в координаты мыши
-	s.setPosition(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y);
-	return s;
-}
-sf::RectangleShape GameEngine::createRectangle(float width, float height, sf::Color color, sf::RenderWindow& window) {
-	sf::Vector2f vecRect(width, height);
-	// Создание круга с радиусом R
-	sf::RectangleShape s(vecRect);
-	// Координаты переносятся в середину круга
-	s.setOrigin(width/2, height/2);
-	// Заливка круга зеленым цветом
-	s.setFillColor(color);
-	// Задается позиция середины круга в координаты мыши
-	s.setPosition(sf::Mouse::getPosition(window).x, sf::Mouse::getPosition(window).y);
-	return s;
 }
