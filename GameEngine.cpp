@@ -23,6 +23,7 @@ void GameEngine::start() {
 	sellShapeText.setCharacterSize(20);
 	sellShapeText.setPosition(0, resolution.y - 40);
 
+
 	while (window.isOpen()){
 		input();
 		update();
