@@ -1,6 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 #include "Objects.h"
+#include "Button.h"
 
 class GameEngine
 {

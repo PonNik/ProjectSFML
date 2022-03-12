@@ -13,35 +13,37 @@ void GameEngine::start() {
     window.create(sf::VideoMode(resolution.x, resolution.y),
         "SFML Works!",
         sf::Style::Fullscreen);
-	// Начинаем запись времени
-	sf::Clock loop_timer;
+	
 	font.loadFromFile("LetoTextSansDefect.otf");
 	text.setFont(font);
-	sf::String str(L" Esc - Выход\n 1 - Выбрать круг\n 2 - Выбрать квадрат\n ЛКМ - создать выбранную фигуру\n ПКМ - удалить выбранную фигуру\n Колесико мыши вниз - Уменьшить фигуру\n Колксико мыши вверх - Увеличить фигуру\n DEL - Удалить все выбранные фигуры");
+	sf::String str(L" Esc - Выход\n 1 - Выбрать круг\n 2 - Выбрать квадрат\n 3 - Выбрать треугольник\n");
+	str += L" ЛКМ - создать выбранную фигуру\n ПКМ - удалить выбранную фигуру\n Колесико мыши вниз - Уменьшить фигуру\n";
+	str += L" Колксико мыши вверх - Увеличить фигуру\n DEL - Удалить все выбранные фигуры";
 	text.setString(str);
 	text.setCharacterSize(20);
 
 	sellShapeText.setFont(font);
 	sellShapeText.setCharacterSize(20);
-	sellShapeText.setPosition(0, resolution.y - 40);
+	sellShapeText.setPosition(0, window.getSize().y - 40);
 
 	while (window.isOpen()){
 		input();
 		update();
-		draw();
-		sf::Int32 frame_duration = loop_timer.getElapsedTime().asMilliseconds(); 
-		sf::Int32 time_to_sleep = int(1000.f / want_fps) - frame_duration;
-		if(time_to_sleep > 0) {
-			sf::sleep(sf::milliseconds(time_to_sleep));
-		}
 	}
 
 }
 void GameEngine::update() {
 	while (window.pollEvent(event))
 	{
+		// Начинаем запись времени
+		sf::Clock loop_timer;
 		input();
-		draw();
+		draw(); 
+		sf::Int32 frame_duration = loop_timer.getElapsedTime().asMilliseconds();
+		sf::Int32 time_to_sleep = int(1000.f / want_fps) - frame_duration;
+		if (time_to_sleep > 0) {
+			sf::sleep(sf::milliseconds(time_to_sleep));
+		}
 	}
 }
 
