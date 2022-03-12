@@ -74,6 +74,7 @@ while (window.isOpen()){
 - Теперь в программе есть треугольники
 
 - Временно! Все фигуры появляются с рандомным цветом
+
 ![image](https://user-images.githubusercontent.com/93863311/158029117-bb13c411-a934-4556-9274-0adbbd74030a.png)
 
 
